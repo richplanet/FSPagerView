@@ -192,6 +192,10 @@ open class FSPagerView: UIView,UICollectionViewDataSource,UICollectionViewDelega
         }
     }
     
+    /// The animation duration of automatic sliding.
+    /// If nil, default system duration will be used.
+    open var animationDuration: TimeInterval?
+    
     // MARK: - Public readonly-properties
     
     /// Returns whether the user has touched the content to initiate scrolling.
@@ -524,7 +528,13 @@ open class FSPagerView: UIView,UICollectionViewDataSource,UICollectionViewDelega
             return self.numberOfSections > 1 ? self.nearbyIndexPath(for: index) : IndexPath(item: index, section: 0)
         }()
         let contentOffset = self.collectionViewLayout.contentOffset(for: indexPath)
-        self.collectionView.setContentOffset(contentOffset, animated: animated)
+        if let duration = self.animationDuration {
+            self.collectionView.setContentOffset(contentOffset,
+                                                 withTimingFunction: CAMediaTimingFunction(name: .linear),
+                                                 duration: duration)
+        } else {
+            self.collectionView.setContentOffset(contentOffset, animated: true)
+        }
     }
     
     /// Returns the index of the specified cell.
@@ -590,7 +600,13 @@ open class FSPagerView: UIView,UICollectionViewDataSource,UICollectionViewDelega
             let item = (indexPath.item+1) % self.numberOfItems
             return self.collectionViewLayout.contentOffset(for: IndexPath(item: item, section: section))
         }()
-        self.collectionView.setContentOffset(contentOffset, animated: true)
+        if let duration = self.animationDuration {
+            self.collectionView.setContentOffset(contentOffset,
+                                                 withTimingFunction: CAMediaTimingFunction(name: .linear),
+                                                 duration: duration)
+        } else {
+            self.collectionView.setContentOffset(contentOffset, animated: true)
+        }
     }
     
     fileprivate func cancelTimer() {

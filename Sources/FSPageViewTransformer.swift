@@ -19,6 +19,7 @@ public enum FSPagerViewTransformerType: Int {
     case ferrisWheel
     case invertedFerrisWheel
     case cubic
+    case fadeOut
 }
 
 open class FSPagerViewTransformer: NSObject {
@@ -37,6 +38,8 @@ open class FSPagerViewTransformer: NSObject {
             self.minimumScale = 0.85
         case .depth:
             self.minimumScale = 0.5
+        case .fadeOut:
+            self.minimumAlpha = 0.0
         default:
             break
         }
@@ -231,6 +234,22 @@ open class FSPagerViewTransformer: NSObject {
                 attributes.alpha = 0
                 attributes.zIndex = 0
             }
+        case .fadeOut:
+            var alpha: CGFloat = 0
+            switch position {
+            case -CGFloat.greatestFiniteMagnitude ..< -1 : // [-Infinity,-1)
+                // This page is way off-screen to the left.
+                alpha = 0
+            case -1 ... 1 :  // [-1,1]
+                let progress = 1 - abs(position)
+                alpha = self.minimumAlpha + progress * (1 - self.minimumAlpha)
+            case 1 ... CGFloat.greatestFiniteMagnitude :  // (1,+Infinity]
+                // This page is way off-screen to the right.
+                alpha = 0
+            default:
+                break
+            }
+            attributes.alpha = alpha
         }
     }
     
