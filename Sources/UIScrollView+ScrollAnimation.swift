@@ -127,7 +127,7 @@ private class ScrollViewTimingDelegate: NSObject {
         if self.displayLink == nil {
             self.displayLink = CADisplayLink(target: self, selector: #selector(updateContentOffset(_:)))
             self.displayLink?.preferredFramesPerSecond = 60
-            self.displayLink?.add(to: .current, forMode: .default)
+            self.displayLink?.add(to: .current, forMode: .common)
         } else {
             self.displayLink?.isPaused = false
         }
